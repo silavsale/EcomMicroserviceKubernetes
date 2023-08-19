@@ -1,7 +1,9 @@
 import { Button } from "@chakra-ui/button";
+import { ListItem, UnorderedList, Input } from "@chakra-ui/react";
 import React from "react";
 import { FiShoppingBag } from "react-icons/fi";
 import Modal from "react-modal";
+import axios from "axios";
 
 const customStyles = {
   content: {
@@ -14,8 +16,10 @@ const customStyles = {
   },
 };
 
-export default function Checkout() {
+export default function Checkout({ order }) {
   let subtitle;
+  const [phone, setPhone] = React.useState("");
+  const [address, setAddress] = React.useState("");
   const [modalIsOpen, setIsOpen] = React.useState(false);
 
   function openModal() {
@@ -23,13 +27,25 @@ export default function Checkout() {
   }
 
   function afterOpenModal() {
-    // references are now sync'd and can be accessed.
     subtitle.style.color = "#f00";
   }
 
   function closeModal() {
     setIsOpen(false);
   }
+
+  const placeOrder = async () => {
+    if (address && phone && order.length) {
+      try {
+        const order = await axios.post("/api/orders", {
+          order,
+          phone,
+          address,
+        });
+        setIsOpen(false);
+      } catch (error) {}
+    }
+  };
 
   return (
     <div>
@@ -51,16 +67,24 @@ export default function Checkout() {
         style={customStyles}
         contentLabel="Example Modal"
       >
-        <h2 ref={(_subtitle) => (subtitle = _subtitle)}>Hello</h2>
-        <button onClick={closeModal}>close</button>
-        <div>I am a modal</div>
-        <form>
-          <input />
-          <button>tab navigation</button>
-          <button>stays</button>
-          <button>inside</button>
-          <button>the modal</button>
-        </form>
+        <UnorderedList>
+          {order.map((item) => (
+            <ListItem>
+              {item.product} x {item.quantity}
+            </ListItem>
+          ))}
+        </UnorderedList>
+        <Input
+          placeholder="Phone Number"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
+        <Input
+          placeholder="Address"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+        />
+        <Button onClick={placeOrder}>Place Order</Button>
       </Modal>
     </div>
   );

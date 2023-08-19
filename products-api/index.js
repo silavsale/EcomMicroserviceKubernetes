@@ -43,11 +43,13 @@ app.put("/orders/:id", async (req, res) => {
 
   if (status === "DELIVERED") {
     try {
-      const connection = await amqp.connect("amqp://rabbitmq-service:5672");
+      const connection = await amqp.connect(
+        "amqp://rabbitmq-cluster-ip-service:5672"
+      );
       console.log({ connection });
       const channel = await connection.createChannel();
       const result = channel.assertQueue("jobs");
-      channel.sendToQueue("jobs", Buffer.from("+1 613 362 5418"));
+      channel.sendToQueue("jobs", Buffer.from(order.phone));
     } catch (error) {
       console.log({ error });
     }
@@ -64,6 +66,8 @@ app.post("/orders", async (req, res) => {
   const order = await Order.create({
     status: "PLACED",
     order: body.order,
+    phone: body.phone,
+    address: body.address,
   });
 
   return res.status(200).json({
@@ -79,7 +83,7 @@ app.get("/orders", async (req, res) => {
 });
 
 mongoose.connect(
-  "mongodb://mongo-srv/products",
+  "mongodb://mongodb-cluster-ip-service/products",
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
