@@ -14,7 +14,24 @@ import Checkout from "./Checkout";
 import axios from "axios";
 
 function App() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState([
+    {
+      name: "Chocolate Fudge",
+      image:
+        "https://www.rebootwithjoe.com/wp-content/uploads/2013/06/Almond-Butter-Chocolate-Fudge.jpg",
+      description: "Gooey and creamy chocolate",
+      price: 14.33,
+    },
+  ]);
+  const [order, setOrder] = useState([]);
+
+  const addToOrder = (product) => {
+    const updatedOrder = [...order];
+    const index = updatedOrder.findIndex((item) => item.product === product);
+    if (index === -1) updatedOrder.push({ product, quantity: 1 });
+    else updatedOrder[index].quantity = updatedOrder[index].quantity + 1;
+    setOrder(updatedOrder);
+  };
 
   const fetchProducts = async () => {
     try {
@@ -41,7 +58,7 @@ function App() {
           Golden Bakery
         </Text>
 
-        <Checkout />
+        <Checkout order={order} />
       </Flex>
       <Divider />
       <Box mt={4}>
@@ -118,6 +135,7 @@ function App() {
                   data-item-url="/"
                   data-item-description={product.description}
                   data-item-price={product.price}
+                  onClick={() => addToOrder(product.name)}
                 >
                   Add to Cart
                 </Button>

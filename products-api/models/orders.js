@@ -10,6 +10,8 @@ const productSchema = new Schema({
 const orderSchema = new Schema({
   status: String,
   order: [productSchema],
+  phone: String,
+  address: String,
 });
 
 const OrderModel = mongoose.model("Order", orderSchema);

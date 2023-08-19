@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: store-app
+  labels:
+    components: store
+spec:
+  containers:
+    - name: store
+      image: friday/store
+      ports:
+        - containerPort: 3000
